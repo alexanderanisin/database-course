@@ -1,5 +1,3 @@
-# Семинар 6: Data Warehousing и OLAP
-
 ## Задача 1
 
 Схема звезды/снежинки под описанную задачу. Продукты хранятся с привязкой к бренду, магазины через цепочку провинция → страна, время — отдельная таблица со всеми нужными атрибутами.
@@ -71,8 +69,6 @@ GROUP BY
 
 `ROLLUP(brand_id, product_id)` строит комбинации справа налево: (бренд, продукт) → (бренд) → (). Комбинация (NULL, продукт) никогда не появится.
 
----
-
 ## Задача 2
 
 `Sales(Product, Month, Store, Amount)` — 5 продуктов, 12 месяцев, 3 магазина.
@@ -85,37 +81,37 @@ $$5 \times 12 \times 3 = \mathbf{180}$$
 
 **(ii)** Датакуб включает все $2^3 = 8$ агрегаций. По каждому измерению добавляется один уровень ALL:
 
-| Представление | Размер |
-|---|---|
+| Представление           | Размер           |
+| ----------------------- | ---------------- |
 | (Product, Month, Store) | 5 × 12 × 3 = 180 |
-| (Product, Month, ALL) | 5 × 12 = 60 |
-| (Product, ALL, Store) | 5 × 3 = 15 |
-| (ALL, Month, Store) | 12 × 3 = 36 |
-| (Product, ALL, ALL) | 5 |
-| (ALL, Month, ALL) | 12 |
-| (ALL, ALL, Store) | 3 |
-| (ALL, ALL, ALL) | 1 |
-| **Итого** | **312** |
+| (Product, Month, ALL)   | 5 × 12 = 60      |
+| (Product, ALL, Store)   | 5 × 3 = 15       |
+| (ALL, Month, Store)     | 12 × 3 = 36      |
+| (Product, ALL, ALL)     | 5                |
+| (ALL, Month, ALL)       | 12               |
+| (ALL, ALL, Store)       | 3                |
+| (ALL, ALL, ALL)         | 1                |
+| **Итого**               | **312**          |
 
 ### (b) Разреженный случай
 
 Исходные кортежи:
 
 | Product | Month | Store |
-|---|---|---|
-| P1 | Jan | S1 |
-| P1 | Jan | S2 |
-| P2 | Feb | S2 |
-| P2 | Feb | S3 |
-| P3 | Jan | S1 |
-| P3 | Feb | S1 |
-| P4 | Feb | S1 |
-| P5 | Jan | S3 |
+| ------- | ----- | ----- |
+| P1      | Jan   | S1    |
+| P1      | Jan   | S2    |
+| P2      | Feb   | S2    |
+| P2      | Feb   | S3    |
+| P3      | Jan   | S1    |
+| P3      | Feb   | S1    |
+| P4      | Feb   | S1    |
+| P5      | Jan   | S3    |
 
 Проходим по всем 8 представлениям и считаем непустые ячейки:
 
 | Представление | Непустых ячеек |
-|---|---|
+| -- | |
 | (Product, Month, Store) | 8 |
 | (Product, Month) | {P1/Jan, P2/Feb, P3/Jan, P3/Feb, P4/Feb, P5/Jan} = **6** |
 | (Product, Store) | {P1/S1, P1/S2, P2/S2, P2/S3, P3/S1, P4/S1, P5/S3} = **7** |
@@ -125,8 +121,6 @@ $$5 \times 12 \times 3 = \mathbf{180}$$
 | (Store) | S1, S2, S3 = **3** |
 | (ALL) | **1** |
 | **Итого** | **38** |
-
----
 
 ## Задача 3
 
@@ -151,7 +145,7 @@ $$5 \times 12 \times 3 = \mathbf{180}$$
 ### (a) Размеры представлений
 
 | Представление | Размер |
-|---|---|
+| - | |
 | (Product, Date) | 100 × 1095 = **109 500** |
 | (Product, month) | 100 × 36 = **3 600** |
 | (Product, week) | 100 × 157 = **15 700** |
@@ -172,7 +166,7 @@ $$5 \times 12 \times 3 = \mathbf{180}$$
 **Раунд 1:**
 
 | Кандидат | Покрывает узлов | Выгода |
-|---|---|---|
+| - | | -- |
 | (Product, month) | 6 | 6 × (109 500 − 3 600) = **635 400** |
 | (Product, week) | 6 | 6 × (109 500 − 15 700) = 562 800 |
 | (ALL, Date) | 5 | 5 × (109 500 − 1 095) = 542 025 |
@@ -193,7 +187,7 @@ $$5 \times 12 \times 3 = \mathbf{180}$$
 - цена 3 600: `(Product, month)`, `(Product, year)`, `(Product, ALL)`, `(ALL, month)`, `(ALL, year)`, `(ALL, ALL)`
 
 | Кандидат | Расчёт выгоды | Выгода |
-|---|---|---|
+| | | -- |
 | **(ALL, Date)** | (ALL,Date): −108 405; (ALL,month): −2 505; (ALL,week): −108 405; (ALL,year): −2 505; (ALL,ALL): −2 505 | **224 325** |
 | (Product, week) | (Prod,week) и (ALL,week) по 93 800 | 187 600 |
 | (ALL, week) | (ALL,week): 109 343; (ALL,year): 3 443; (ALL,ALL): 3 443 | 116 229 |
@@ -207,25 +201,23 @@ $$635\ 400 + 224\ 325 = \mathbf{859\ 725}$$
 
 Проверка через итоговые стоимости:
 
-| Узел | Источник | Стоимость |
-|---|---|---|
-| (Product, Date) | (Product, Date) | 109 500 |
-| (Product, week) | (Product, Date) | 109 500 |
-| (Product, month) | (Product, month) | 3 600 |
-| (Product, year) | (Product, month) | 3 600 |
-| (Product, ALL) | (Product, month) | 3 600 |
-| (ALL, Date) | (ALL, Date) | 1 095 |
-| (ALL, month) | (ALL, Date) | 1 095 |
-| (ALL, week) | (ALL, Date) | 1 095 |
-| (ALL, year) | (ALL, Date) | 1 095 |
-| (ALL, ALL) | (ALL, Date) | 1 095 |
-| **Итого** | | **235 275** |
+| Узел             | Источник         | Стоимость   |
+| ---------------- | ---------------- | ----------- |
+| (Product, Date)  | (Product, Date)  | 109 500     |
+| (Product, week)  | (Product, Date)  | 109 500     |
+| (Product, month) | (Product, month) | 3 600       |
+| (Product, year)  | (Product, month) | 3 600       |
+| (Product, ALL)   | (Product, month) | 3 600       |
+| (ALL, Date)      | (ALL, Date)      | 1 095       |
+| (ALL, month)     | (ALL, Date)      | 1 095       |
+| (ALL, week)      | (ALL, Date)      | 1 095       |
+| (ALL, year)      | (ALL, Date)      | 1 095       |
+| (ALL, ALL)       | (ALL, Date)      | 1 095       |
+| **Итого**        |                  | **235 275** |
 
 $1\ 095\ 000 - 235\ 275 = 859\ 725$
 
----
-
-## Задача 4 ★★
+## Задача 4
 
 Надо показать, что граница $(e-1)/e$ точная: для любого $k$ найдётся решётка, где $B_\text{greedy}/B_\text{opt}$ ровно равно $1 - \left(\frac{k-1}{k}\right)^k$.
 
