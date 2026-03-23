@@ -1,5 +1,7 @@
 # Advanced Databases
 
+Анисин Александр Александрович, МСПИН241
+
 | Задание              | Решение                                    |
 | -------------------- | ------------------------------------------ |
 | Relational Refresher | [Ссылка](relational-refresher/solution.md) |
